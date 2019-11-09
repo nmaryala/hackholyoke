@@ -1,13 +1,44 @@
 import os
+import cv2
 from uuid import uuid4
 
 from flask import Flask, request, render_template, send_from_directory
+
+from keras.models import load_model
+from sklearn.datasets import load_files   
+from keras.utils import np_utils
+from glob import glob
+from keras import applications, callbacks
+from keras.preprocessing.image import ImageDataGenerator 
+from keras import optimizers
+from keras.models import Sequential,Model,load_model
+from keras.layers import Dense, Dropout, Flatten, Conv2D, MaxPool2D,GlobalAveragePooling2D
+from keras.callbacks import TensorBoard,ReduceLROnPlateau,ModelCheckpoint
+from keras.optimizers import SGD, Adam
+from PIL import Image
+import numpy as np
+
 
 __author__ = 'nmaryala'
 
 app = Flask(__name__)
 # app = Flask(__name__, static_folder="images")
 
+
+base_model = applications.resnet50.ResNet50(weights= None, include_top=False, input_shape= (64,64,3))
+x = base_model.output
+x = GlobalAveragePooling2D()(x)
+lr =  0.02535465287856519 
+do =  0.5762909269041454
+x = Dropout(do)(x) # original = 0.7
+num_classes = 10
+predictions = Dense(num_classes, activation= 'softmax')(x)
+model = Model(inputs = base_model.input, outputs = predictions)
+best_weights = 'weights-improvement-29-0.77.hdf5'
+weight_path = 'weights/{}'.format(best_weights)
+model.load_weights(weight_path)
+adam = Adam(lr= lr)
+model.compile(optimizer= adam, loss='categorical_crossentropy', metrics=['accuracy'])
 
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -34,6 +65,16 @@ def upload():
         print ("Accept incoming file:", filename)
         print ("Save it to:", destination)
         upload.save(destination)
+        name = "images/"+upload.filename
+        X_test = cv2.imread(name)
+        img = Image.fromarray(np.uint8(X_test/255))
+        img = img.resize((64, 64), Image.ANTIALIAS)
+        
+        mean = 0
+        std = 1
+        img = (np.array(img) - mean)/std
+        prediction = model.predict(img.reshape(1, 64, 64, 3))    
+
 
     # return send_from_directory("images", filename, as_attachment=True)
     return render_template("report.html", image_name=filename)
