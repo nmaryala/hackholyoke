@@ -186,19 +186,40 @@ img.emoji {
 	<div class="a8c-posts-list-item__excerpt">
 		<p>You are diagnosed with {{major}}, with {{cert}}% certanity. Please Download you full health report below: </p>
 	</div>
-</article>
+	</article>
 				</li>
 					</ul>
 
 
-                    <a href="https://drive.google.com/file/d/1otDINwIScoqUUo9qMZ2iMH7hrxnZa-GM/view?usp=sharing" class="a8c-posts-list__view-all">
+                    <a href="https://drive.google.com/open?id=17ZZ0fSqLvHK87EPbxXFkpgNDA04I2Q5h" target="_blank" class="a8c-posts-list__view-all">
                         Download report		</a>
 	</div>
 
-	<p><img src=" {{url_for('send_image', filename=image_name)}}" alt="Smiley face" border="5" style="float:right;width:1220px;height:620px;" >
-		You are in safe hands. Don't worry we will send you a detailed report on your health. {{preds}} </p>
+	<table id="example" class="display" style="width:100%">
+			<thead>
+				<tr>
+					<th>Ailment</th>
+					<th>Confidence</th>
+				</tr>
+			</thead>
+				<tr>
+					<th>{{major}}</th>
+					<th>{{cert}}</th>
+				</tr>
+				<tr>
+					<th>{{major1}}</th>
+					<th>{{cert1}}</th>
+				</tr>
+				<tr>
+					<th>{{major2}}</th>
+					<th>{{cert2}}</th>
+				</tr>
+		</table>
 
-	
+	<p><img src=" {{url_for('send_image', filename=image_name)}}" alt="Smiley face" border="5" style="float:right;width:1220px;height:620px;" >
+		Please check the image you have uploaded. </p>
+
+
 	
 
 	<div class="a8c-posts-list-item__excerpt">

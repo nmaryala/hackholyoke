@@ -94,12 +94,23 @@ def upload():
             count = 0
             maj = ''
             certain = 0
+            maj1 = ''
+            certain1 = 0
+            maj2 = ''
+            certain2 = 0
             for i in sorted(dic , key=dic.get, reverse = True)[:3]:
                 dic2[i] = dic[i]
                 dic3[labels[i]] = dic[i]
                 if count == 0:
                     maj = labels[i]
                     certain = dic[i]
+                if count == 1:
+                    maj1 = labels[i]
+                    certain1 = dic[i]
+                if count == 2:
+                    maj2 = labels[i]
+                    certain2 = dic[i]
+
                 count += 1
 
             print('Prediction: ', dic2)
@@ -107,7 +118,7 @@ def upload():
 
 
     # return send_from_directory("images", filename, as_attachment=True)
-    return render_template("report.html", image_name=filename, preds = dic3, major = maj, cert = certain)
+    return render_template("report.html", image_name=filename, preds = dic3, major = maj, cert = certain, major1 = maj1, cert1 = certain1, major2 = maj2, cert2 = certain2)
 
 @app.route('/upload/<filename>')
 def send_image(filename):
