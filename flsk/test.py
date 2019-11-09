@@ -14,7 +14,7 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 @app.route("/")
 def index():
-    return render_template("upload.html")
+    return render_template("website.html")
 
 @app.route("/upload", methods=["POST"])
 def upload():
@@ -36,7 +36,7 @@ def upload():
         upload.save(destination)
 
     # return send_from_directory("images", filename, as_attachment=True)
-    return render_template("complete_display_image.html", image_name=filename)
+    return render_template("report.html", image_name=filename)
 
 @app.route('/upload/<filename>')
 def send_image(filename):
