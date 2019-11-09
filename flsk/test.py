@@ -17,6 +17,7 @@ from keras.callbacks import TensorBoard,ReduceLROnPlateau,ModelCheckpoint
 from keras.optimizers import SGD, Adam
 from PIL import Image
 import numpy as np
+import tensorflow as tf
 
 
 __author__ = 'nmaryala'
@@ -24,23 +25,27 @@ __author__ = 'nmaryala'
 app = Flask(__name__)
 # app = Flask(__name__, static_folder="images")
 
-
+global model
 base_model = applications.resnet50.ResNet50(weights= None, include_top=False, input_shape= (64,64,3))
 x = base_model.output
 x = GlobalAveragePooling2D()(x)
-lr =  0.02535465287856519 
+lr =  0.02535465287856519
 do =  0.5762909269041454
 x = Dropout(do)(x) # original = 0.7
 num_classes = 10
 predictions = Dense(num_classes, activation= 'softmax')(x)
+
+x = Dropout(do)(x) # original = 0.7
+predictions = Dense(num_classes, activation= 'softmax')(x)
+model = Model(inputs = base_model.input, outputs = predictions)
+global graph
+graph = tf.get_default_graph()
 model = Model(inputs = base_model.input, outputs = predictions)
 best_weights = 'weights-improvement-29-0.77.hdf5'
 weight_path = 'weights/{}'.format(best_weights)
 model.load_weights(weight_path)
 adam = Adam(lr= lr)
 model.compile(optimizer= adam, loss='categorical_crossentropy', metrics=['accuracy'])
-
-
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 @app.route("/")
@@ -73,11 +78,36 @@ def upload():
         mean = 0
         std = 1
         img = (np.array(img) - mean)/std
-        prediction = model.predict(img.reshape(1, 64, 64, 3))    
+        diseases = 'Actinic keratoses and intraepithelial carcinoma / Bowen\'s disease (akiec), basal cell carcinoma (bcc), benign keratosis-like lesions (solar lentigines / seborrheic keratoses and lichen-planus like keratoses, bkl), dermatofibroma (df), melanoma (mel), melanocytic nevi (nv) and vascular lesions (angiomas, angiokeratomas, pyogenic granulomas and hemorrhage, vasc).'
+        labels = diseases.split(',')
+        print(labels)
+        print(len(labels))
+        dic = {}
+
+        with graph.as_default():
+            prediction = model.predict(img.reshape(1, 64, 64, 3))[0]
+            print(type(prediction))
+            for i in range(len(list(prediction))):
+                dic[i] = prediction[i]
+            dic2 = {}
+            dic3 = {}
+            count = 0
+            maj = ''
+            certain = 0
+            for i in sorted(dic , key=dic.get, reverse = True)[:3]:
+                dic2[i] = dic[i]
+                dic3[labels[i]] = dic[i]
+                if count == 0:
+                    maj = labels[i]
+                    certain = dic[i]
+                count += 1
+
+            print('Prediction: ', dic2)
+
 
 
     # return send_from_directory("images", filename, as_attachment=True)
-    return render_template("report.html", image_name=filename)
+    return render_template("report.html", image_name=filename, preds = dic3, major = maj, cert = certain)
 
 @app.route('/upload/<filename>')
 def send_image(filename):
