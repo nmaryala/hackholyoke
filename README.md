@@ -1,4 +1,4 @@
-# hackholyoke
+# Dermax - HackHolyoke2019
 Dermax is the virtual skin care assisant
 
 ### Tech stack:
