@@ -6,5 +6,8 @@ Dermax is the virtual skin care assisant
 2. Hosted the website using Flask server.
 3. Used Libraries like Keras, Pandas, TensorFlow and trained on FaceNet50.
 
+Find the demo at:https://youtu.be/BMUNDp13B1I
+
 You can find more details about the project here:
 https://devpost.com/software/hackholyoke-f0yusi
+
